@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital PM Check Sheet</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 25px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 9px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #f1f3f5;
+            text-align: center;
+        }
+
+        td:first-child {
+            text-align: center;
+        }
+
+        .result-ok {
+            color: green;
+            font-weight: bold;
+        }
+
+        .result-ng {
+            color: red;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-print {
+            background: #0d6efd;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 7px;
+            display: none;
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .footer {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            padding: 15px;
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                padding: 10px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 21px;
+            }
+        }
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .section,
+            .header {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .actions,
+            .status {
+                display: none !important;
+            }
+
+            input,
+            select,
+            textarea {
+                border: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Digital Preventive Maintenance Check Sheet</h1>
+        <p>Electrical Motor Preventive Maintenance</p>
+    </div>
+
+    <!-- EQUIPMENT INFORMATION -->
+    <div class="section">
+
+        <div class="section-title">
+            1. Equipment Information
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+                <label>Equipment / Tag No.</label>
+                <input type="text" id="equipment" placeholder="Example: CWP-MTR-01">
+            </div>
+
+            <div class="field">
+                <label>Work Order No.</label>
+                <input type="text" id="wo" placeholder="Example: WO26012345">
+            </div>
+
+            <div class="field">
+                <label>Area</label>
+                <input type="text" id="area" placeholder="Example: CWP Area">
+            </div>
+
+            <div class="field">
+                <label>PM Date</label>
+                <input type="date" id="pmDate">
+            </div>
+
+            <div class="field">
+                <label>PM Type</label>
+
+                <select id="pmType">
+                    <option value="">Select PM Type</option>
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                    <option>Quarterly</option>
+                    <option>Yearly</option>
+                    <option>Overhaul</option>
+                </select>
+
+            </div>
+
+            <div class="field">
+                <label>Technician</label>
+                <input type="text" id="technician" placeholder="Technician Name">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHECKLIST -->
+    <div class="section">
+
+        <div class="section-title">
+            2. PM Inspection Checklist
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>No.</th>
+                        <th>Inspection Item</th>
+                        <th>Standard / Criteria</th>
+                        <th>Actual / Measurement</th>
+                        <th>Unit</th>
+                        <th>Result</th>
+                        <th>Remark</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>Motor physical condition</td>
+                        <td>Clean and no visible damage</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Abnormal noise</td>
+                        <td>No abnormal noise</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>Motor temperature</td>
+                        <td>Within operating limit</td>
+                        <td><input type="number"></td>
+                        <td>°C</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>Vibration</td>
+                        <td>Within allowable limit</td>
+                        <td><input type="number" step="0.1"></td>
+                        <td>mm/s</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>Terminal connection</td>
+                        <td>Tight and no overheating indication</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td>Insulation condition</td>
+                        <td>No abnormal indication</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td>Cooling fan</td>
+                        <td>Normal operation</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td>Grounding connection</td>
+                        <td>Secure and properly connected</td>
+                        <td><input type="text"></td>
+                        <td>-</td>
+                        <td>
+                            <select>
+                                <option>OK</option>
+                                <option>NG</option>
+                            </select>
+                        </td>
+                        <td><input type="text"></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- FINDING -->
+    <div class="section">
+
+        <div class="section-title">
+            3. Finding & Corrective Action
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>Finding</label>
+
+                <textarea
+                    id="finding"
+                    placeholder="Describe abnormal condition / finding...">
+                </textarea>
+
+            </div>
+
+            <div class="field">
+
+                <label>Corrective Action</label>
+
+                <textarea
+                    id="action"
+                    placeholder="Describe corrective action...">
+                </textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- APPROVAL -->
+    <div class="section">
+
+        <div class="section-title">
+            4. Verification
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>Technician</label>
+
+                <input
+                    type="text"
+                    id="technicianSign"
+                    placeholder="Technician Name">
+
+            </div>
+
+            <div class="field">
+
+                <label>Supervisor</label>
+
+                <input
+                    type="text"
+                    id="supervisor"
+                    placeholder="Supervisor Name">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTION BUTTON -->
+    <div class="section">
+
+        <div class="actions">
+
+            <button
+                class="btn-save"
+                onclick="saveData()">
+                Save Check Sheet
+            </button>
+
+            <button
+                class="btn-print"
+                onclick="window.print()">
+                Print / PDF
+            </button>
+
+            <button
+                class="btn-reset"
+                onclick="resetForm()">
+                Reset
+            </button>
+
+        </div>
+
+        <div
+            id="status"
+            class="status">
+            Check Sheet saved successfully on this device.
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
+        Digital PM Check Sheet – Prototype
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // Set today's date automatically
+    document.getElementById("pmDate").value =
+        new Date().toISOString().split("T")[0];
+
+
+    function saveData() {
+
+        const data = {
+
+            equipment:
+                document.getElementById("equipment").value,
+
+            wo:
+                document.getElementById("wo").value,
+
+            area:
+                document.getElementById("area").value,
+
+            pmDate:
+                document.getElementById("pmDate").value,
+
+            pmType:
+                document.getElementById("pmType").value,
+
+            technician:
+                document.getElementById("technician").value,
+
+            finding:
+                document.getElementById("finding").value,
+
+            action:
+                document.getElementById("action").value,
+
+            supervisor:
+                document.getElementById("supervisor").value
+
+        };
+
+
+        localStorage.setItem(
+            "digitalPMCheckSheet",
+            JSON.stringify(data)
+        );
+
+
+        const status =
+            document.getElementById("status");
+
+        status.style.display = "block";
+
+        setTimeout(function () {
+
+            status.style.display = "none";
+
+        }, 3000);
+
+    }
+
+
+    function resetForm() {
+
+        if (
+            confirm(
+                "Are you sure you want to reset this check sheet?"
+            )
+        ) {
+
+            document
+                .querySelectorAll("input, textarea")
+                .forEach(function(element) {
+
+                    if (element.type !== "date") {
+                        element.value = "";
+                    }
+
+                });
+
+            document
+                .querySelectorAll("select")
+                .forEach(function(element) {
+
+                    element.selectedIndex = 0;
+
+                });
+
+            document.getElementById("pmDate").value =
+                new Date().toISOString().split("T")[0];
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
